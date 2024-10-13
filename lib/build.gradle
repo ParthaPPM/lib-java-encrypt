@@ -1,0 +1,91 @@
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+    id 'signing'
+}
+
+group = "io.github.parthappm"
+archivesBaseName = "${rootProject.name}"
+version = '0.1'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+}
+
+test {
+}
+
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+tasks.withType(Javadoc) {
+    options.encoding = 'UTF-8'
+}
+
+publishing {
+    publications {
+        maven (MavenPublication) {
+            groupId = "${group}"
+            artifactId = "${archivesBaseName}"
+            version = "${version}"
+            from components.java
+
+            pom {
+                name = "${group}:${archivesBaseName}"
+                description = "Java library to encrypt and decrypt files based on AES CBC encryption."
+                url = "https://github.com/ParthaPPM/lib-java-encrypt"
+                licenses {
+                    license {
+                        name = "GNU General Public License v3.0"
+                        url = "https://www.gnu.org/licenses/gpl-3.0.en.html"
+                    }
+                }
+                developers {
+                    developer {
+                        id = "ParthaPPM"
+                        name = "Partha Pratim Manna"
+                        email = "partha_pratim_manna@yahoo.in"
+                    }
+                }
+                scm {
+                    connection = "scm:git:git://github.com/ParthaPPM/lib-java-encrypt.git"
+                    developerConnection = "scm:git:ssh://github.com:ParthaPPM/lib-java-encrypt.git"
+                    url = "https://github.com/ParthaPPM/lib-java-encrypt"
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            name = "Local"
+            url = uri("${buildDir}/publishing-repository")
+        }
+        maven {
+            name = "OSSRH"
+            url = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+            credentials {
+                username = "${ossrhUsername}"
+                password = "${ossrhPassword}"
+            }
+        }
+    }
+}
+
+signing {
+    sign publishing.publications.maven
+}
+
+javadoc {
+    if (JavaVersion.current().isJava9Compatible()) {
+        options.addBooleanOption("html5", true)
+    }
+}
